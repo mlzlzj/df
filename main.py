@@ -12,8 +12,6 @@ urls = [
 # 定义多个对象用于存储不同内容的行文本
 ys_lines = []  # 央视频道
 ws_lines = []  # 卫视频道
-gao_lines = []  # 地方台-港澳频道
-tw_lines = []  # 地方台-台湾频道
 hn_lines = []  # 地方台-湖南频道
 sh_lines = []  # 地方台-上海频道
 bj_lines = []   # 地方台-北京频道
@@ -33,6 +31,8 @@ yn_lines = []  # 地方台-云南频道
 cq_lines = []  # 地方台-重庆频道
 jl_lines = []  # 地方台-吉林频道
 xj_lines = []  # 地方台-新疆频道
+gao_lines = []  # 地方台-港澳频道
+tw_lines = []  # 地方台-台湾频道
 radio_lines = []  # 地方台-地方电台
 # other_lines = []
 
@@ -264,8 +264,6 @@ version = datetime.now().strftime("%Y%m%d") + ",url"
 all_lines = ["央视频道,#genre#"] + sort_data(ys_dictionary, set(correct_name_data(corrections_name, ys_lines))) + ['\n'] + \
             ["卫视频道,#genre#"] + sort_data(ws_dictionary, set(correct_name_data(corrections_name, ws_lines))) + ['\n'] + \
             ["湖南频道,#genre#"] + sorted(set(correct_name_data(corrections_name, hn_lines))) + ['\n'] + \
-            ["港澳频道,#genre#"] + sort_data(gao_dictionary, set(correct_name_data(corrections_name, gao_lines))) + ['\n'] + \
-            ["台湾频道,#genre#"] + sort_data(tw_dictionary, set(correct_name_data(corrections_name, tw_lines))) + ['\n'] + \
             ["上海频道,#genre#"] + sort_data(sh_dictionary, set(correct_name_data(corrections_name, sh_lines))) + ['\n'] + \
             ["北京频道,#genre#"] + sort_data(bj_dictionary, set(correct_name_data(corrections_name, bj_lines))) + ['\n'] + \
             ["山东频道,#genre#"] + sort_data(sd_dictionary, set(correct_name_data(corrections_name, sd_lines))) + ['\n'] + \
@@ -284,6 +282,8 @@ all_lines = ["央视频道,#genre#"] + sort_data(ys_dictionary, set(correct_name
             ["重庆频道,#genre#"] + sorted(set(correct_name_data(corrections_name, cq_lines))) + ['\n'] + \
             ["吉林频道,#genre#"] + sorted(set(correct_name_data(corrections_name, jl_lines))) + ['\n'] + \
             ["新疆频道,#genre#"] + sorted(set(correct_name_data(corrections_name, xj_lines))) + ['\n'] + \
+            ["港澳频道,#genre#"] + sort_data(gao_dictionary, set(correct_name_data(corrections_name, gao_lines))) + ['\n'] + \
+            ["台湾频道,#genre#"] + sort_data(tw_dictionary, set(correct_name_data(corrections_name, tw_lines))) + ['\n'] + \
             ["地方电台,#genre#"] + sort_data(radio_dictionary, set(radio_lines)) + ['\n'] + \
             ["更新时间,#genre#"] + [version]
 
