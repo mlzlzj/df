@@ -33,7 +33,7 @@ jobs:
     - name: Upload generated files
       uses: actions/upload-artifact@v2
       with:
-        name: generated-files
+        name: iptv
         path: |
           iptv.txt
           # qita.txt
@@ -48,8 +48,8 @@ jobs:
           git commit -m ":tada:  AutoUpdate generated files"
 
           current_datetime=$(date +"%Y%m%d_%H%M%S")
-          cp merged_output.txt history/"${current_datetime}_iptv.txt"
-          # cp others_output.txt history/"${current_datetime}_qita.txt"
+          cp iptv.txt history/"${current_datetime}_iptv.txt"
+          # cp qita.txt history/"${current_datetime}_qita.txt"
           git add history/"${current_datetime}_iptv.txt"
           # git add history/"${current_datetime}_qita.txt"
           git commit -m "Archive file with timestamp"
