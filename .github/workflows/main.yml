@@ -1,0 +1,60 @@
+name: 'Daily Job'
+
+on:
+  schedule:
+    - cron: '0 03 * * *'  # 每天UTC时间00:00运行
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to deploy to'
+        required: true
+        default: 'production'
+
+jobs:
+  run_job:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+      
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.12'
+        
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        
+    - name: Run Python script
+      run: python main.py
+      
+    - name: Upload generated files
+      uses: actions/upload-artifact@v2
+      with:
+        name: generated-files
+        path: |
+          iptv.txt
+          # qita.txt
+          
+    - name: Commit changes
+      run: |
+          git config --local user.email "actions@github.com"
+          git config --local user.name "GitHub Actions"
+          git add iptv.txt
+          # git add iptv.m3u
+          # git add qita.txt
+          git commit -m ":tada:  AutoUpdate generated files"
+
+          current_datetime=$(date +"%Y%m%d_%H%M%S")
+          cp merged_output.txt history/"${current_datetime}_iptv.txt"
+          # cp others_output.txt history/"${current_datetime}_qita.txt"
+          git add history/"${current_datetime}_iptv.txt"
+          # git add history/"${current_datetime}_qita.txt"
+          git commit -m "Archive file with timestamp"
+          
+    - name: Push changes
+      uses: ad-m/github-push-action@master
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}          
