@@ -288,18 +288,12 @@ all_lines = ["央视频道,#genre#"] + sort_data(ys_dictionary, set(correct_name
             ["更新时间,#genre#"] + [version]
 
 # 将合并后的文本写入文件
-output_file = "merged_output.txt"
-# others_file = "others_output.txt"
+output_file = "iptv_list.txt"
 try:
     with open(output_file, 'w', encoding='utf-8') as f:
         for line in all_lines:
             f.write(line + '\n')
     print(f"合并后的文本已保存到文件: {output_file}")
 
-    # with open(others_file, 'w', encoding='utf-8') as f:
-    #     for line in other_lines:
-    #         f.write(line + '\n')
-    # print(f"Others已保存到文件: {others_file}")
-
-except Exception as e:
+   except Exception as e:
     print(f"保存文件时发生错误：{e}")
