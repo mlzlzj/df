@@ -2,7 +2,7 @@ name: 'Daily Job'
 
 on:
   schedule:
-    - cron: '0 03 * * *'  # 每天UTC时间00:00运行
+    - cron: '0 0 * * *'  # 每天UTC时间00:00运行
   workflow_dispatch:
     inputs:
       environment:
@@ -33,28 +33,30 @@ jobs:
     - name: Upload generated files
       uses: actions/upload-artifact@v2
       with:
-        name: iptv
+        name: generated-files
         path: |
-          iptv.txt
-          # qita.txt
+          merged_output.txt
+          # others_output.txt
           
     - name: Commit changes
       run: |
           git config --local user.email "actions@github.com"
           git config --local user.name "GitHub Actions"
-          git add iptv.txt
-          # git add iptv.m3u
-          # git add qita.txt
+          git add merged_output.txt
+          # git add merged_output.m3u
+          # git add others_output.txt
           git commit -m ":tada:  AutoUpdate generated files"
 
-    #       current_datetime=$(date +"%Y%m%d_%H%M%S")
-    #       cp iptv.txt history/"${current_datetime}_iptv.txt"
-    #       # cp qita.txt history/"${current_datetime}_qita.txt"
-    #       git add history/"${current_datetime}_iptv.txt"
-    #       # git add history/"${current_datetime}_qita.txt"
-    #       git commit -m "Archive file with timestamp"
+          current_datetime=$(date +"%Y%m%d_%H%M%S")
+          cp merged_output.txt history/"${current_datetime}_merged_output.txt"
+          # cp others_output.txt history/"${current_datetime}_others_output.txt"
+          git add history/"${current_datetime}_merged_output.txt"
+          # git add history/"${current_datetime}_others_output.txt"
+          git commit -m "Archive file with timestamp"
           
-    # - name: Push changes
-    #   uses: ad-m/github-push-action@master
-    #   with:
-    #     github_token: ${{ secrets.GITHUB_TOKEN }}          
+    - name: Push changes
+      uses: ad-m/github-push-action@master
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+    
+        
