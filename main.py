@@ -294,6 +294,6 @@ try:
         for line in all_lines:
             f.write(line + '\n')
     print(f"合并后的文本已保存到文件: {output_file}")
-
-   except Exception as e:
+except Exception as e:
     print(f"保存文件时发生错误：{e}")
+    
