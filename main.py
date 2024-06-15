@@ -6,13 +6,12 @@ from datetime import datetime
 # 定义要访问的多个URL
 urls = [
     'https://raw.gitcode.com/ouu/scc/raw/main/kankan.txt',
-    'https://taoiptv.com/source/iptv.txt?token=8zlxhttq9h01ahaw',
+    
 ]
 
 # 定义多个对象用于存储不同内容的行文本
 ys_lines = []  # 央视频道
 ws_lines = []  # 卫视频道
-dy_lines = []  # 影视频道
 hn_lines = []  # 地方台-湖南频道
 sh_lines = []  # 地方台-上海频道
 bj_lines = []  # 地方台-北京频道
@@ -98,8 +97,6 @@ def process_url(url):
                         ys_lines.append(process_name_string(line.strip()))
                     elif channel_name in ws_dictionary:  # 卫视频道
                         ws_lines.append(process_name_string(line.strip()))
-                    elif channel_name in dy_dictionary:  # 影视频道
-                        dy_lines.append(process_name_string(line.strip()))
                     elif channel_name in hn_dictionary:  # 地方台-湖南频道
                         hn_lines.append(process_name_string(line.strip()))
                     elif channel_name in sh_dictionary:  # 上海频道
@@ -173,7 +170,6 @@ def read_txt_to_array(file_name):
 # 读取文本
 ys_dictionary = read_txt_to_array('央视频道.txt')  # 仅排序用
 ws_dictionary = read_txt_to_array('卫视频道.txt')  # 过滤+排序
-dy_dictionary = read_txt_to_array('影视频道.txt')  # 过滤
 hn_dictionary = read_txt_to_array('地方台/湖南频道.txt')  # 过滤
 sh_dictionary = read_txt_to_array('地方台/上海频道.txt')  # 过滤
 bj_dictionary = read_txt_to_array('地方台/北京频道.txt')  # 过滤
@@ -265,10 +261,9 @@ def custom_sort(s):
 
 
 # 合并所有对象中的行文本（去重，排序后拼接）
-version = datetime.now().strftime("%Y%m%d") + ",url"
+time = datetime.now().strftime("%Y-%m-%d %H:%M:%S") + ",url"
 all_lines = ["央视频道,#genre#"] + sort_data(ys_dictionary, set(correct_name_data(corrections_name, ys_lines))) + ['\n'] + \
             ["卫视频道,#genre#"] + sort_data(ws_dictionary, set(correct_name_data(corrections_name, ws_lines))) + ['\n'] + \
-            ["影视频道,#genre#"] + sorted(set(correct_name_data(corrections_name, dy_lines))) + ['\n'] + \
             ["湖南频道,#genre#"] + sorted(set(correct_name_data(corrections_name, hn_lines))) + ['\n'] + \
             ["上海频道,#genre#"] + sort_data(sh_dictionary, set(correct_name_data(corrections_name, sh_lines))) + ['\n'] + \
             ["北京频道,#genre#"] + sort_data(bj_dictionary, set(correct_name_data(corrections_name, bj_lines))) + ['\n'] + \
@@ -291,7 +286,7 @@ all_lines = ["央视频道,#genre#"] + sort_data(ys_dictionary, set(correct_name
             ["港澳频道,#genre#"] + sort_data(gao_dictionary, set(correct_name_data(corrections_name, gao_lines))) + ['\n'] + \
             ["台湾频道,#genre#"] + sort_data(tw_dictionary, set(correct_name_data(corrections_name, tw_lines))) + ['\n'] + \
             ["地方电台,#genre#"] + sort_data(radio_dictionary, set(radio_lines)) + ['\n'] + \
-            ["更新时间,#genre#"] + [version]
+            ["更新时间,#genre#"] + [time]
 
 # 将合并后的文本写入文件
 output_file = "iptv_list.txt"
