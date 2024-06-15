@@ -47,14 +47,14 @@ jobs:
           # git add qita.txt
           git commit -m ":tada:  AutoUpdate generated files"
 
-          current_datetime=$(date +"%Y%m%d_%H%M%S")
-          cp iptv.txt history/"${current_datetime}_iptv.txt"
-          # cp qita.txt history/"${current_datetime}_qita.txt"
-          git add history/"${current_datetime}_iptv.txt"
-          # git add history/"${current_datetime}_qita.txt"
-          git commit -m "Archive file with timestamp"
+    #       current_datetime=$(date +"%Y%m%d_%H%M%S")
+    #       cp iptv.txt history/"${current_datetime}_iptv.txt"
+    #       # cp qita.txt history/"${current_datetime}_qita.txt"
+    #       git add history/"${current_datetime}_iptv.txt"
+    #       # git add history/"${current_datetime}_qita.txt"
+    #       git commit -m "Archive file with timestamp"
           
-    - name: Push changes
-      uses: ad-m/github-push-action@master
-      with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}          
+    # - name: Push changes
+    #   uses: ad-m/github-push-action@master
+    #   with:
+    #     github_token: ${{ secrets.GITHUB_TOKEN }}          
