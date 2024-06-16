@@ -6,12 +6,13 @@ from datetime import datetime
 # 定义要访问的多个URL
 urls = [
     'https://raw.gitcode.com/ouu/scc/raw/main/kankan.txt',
-    
+    # 'https://taoiptv.com/source/iptv.txt?token=8zlxhttq9h01ahaw',
 ]
 
 # 定义多个对象用于存储不同内容的行文本
 ys_lines = []  # 央视频道
 ws_lines = []  # 卫视频道
+dy_lines = []  # 影视频道
 hn_lines = []  # 地方台-湖南频道
 sh_lines = []  # 地方台-上海频道
 bj_lines = []  # 地方台-北京频道
@@ -48,27 +49,21 @@ def process_name_string(input_str):
 
 
 def process_part(part_str):
-    # 处理逻辑
     if "CCTV" in part_str and "://" not in part_str:
-        # part_str = part_str.replace("IPV6", "")  # 先剔除IPV6字样
-        part_str = part_str.replace("PLUS", "+")  # 替换
+        part_str = part_str.replace("IPV6", "")  # 先剔除IPV6字样
+        part_str = part_str.replace("PLUS", "+")
         filtered_str = ''.join(char for char in part_str if char.isdigit() or char == 'K' or char == '+')
-        if not filtered_str.strip():  # 处理特殊情况，如果发现没有找到频道数字返回原名称
+        if not filtered_str.strip():
             filtered_str = part_str.replace("CCTV", "")
-
-        if len(filtered_str) > 2 and re.search(r'4K|8K', filtered_str):  # 特殊处理CCTV中部分4K和8K名称
-            # 使用正则表达式替换，删除4K或8K后面的字符，并且保留4K或8K
+        if len(filtered_str) > 2 and re.search(r'4K|8K', filtered_str):
             filtered_str = re.sub(r'(4K|8K).*', r'\1', filtered_str)
             if len(filtered_str) > 2:
-                # 给4K或8K添加括号
                 filtered_str = re.sub(r'(4K|8K)', r'(\1)', filtered_str)
 
         return "CCTV" + filtered_str
 
     elif "卫视" in part_str:
-        # 定义正则表达式模式，匹配“卫视”后面的内容
         pattern = r'卫视「.*」'
-        # 使用sub函数替换匹配的内容为空字符串
         result_str = re.sub(pattern, '卫视', part_str)
         return result_str
 
@@ -77,26 +72,21 @@ def process_part(part_str):
 
 def process_url(url):
     try:
-        # 打开URL并读取内容
         with urllib.request.urlopen(url) as response:
-            # 以二进制方式读取数据
             data = response.read()
-            # 将二进制数据解码为字符串
             text = data.decode('utf-8')
-            channel_name = ""
-            channel_address = ""
-
             # 逐行处理内容
             lines = text.split('\n')
             for line in lines:
                 if "#genre#" not in line and "," in line and "://" in line:
                     channel_name = line.split(',')[0].strip()
-                    channel_address = line.split(',')[1].strip()
                     # 根据行内容判断存入哪个对象
                     if "CCTV" in channel_name:  # 央视频道
                         ys_lines.append(process_name_string(line.strip()))
                     elif channel_name in ws_dictionary:  # 卫视频道
                         ws_lines.append(process_name_string(line.strip()))
+                    elif channel_name in dy_dictionary:  # 影视频道
+                        dy_lines.append(process_name_string(line.strip()))
                     elif channel_name in hn_dictionary:  # 地方台-湖南频道
                         hn_lines.append(process_name_string(line.strip()))
                     elif channel_name in sh_dictionary:  # 上海频道
@@ -144,7 +134,6 @@ def process_url(url):
                     # else:
                     #     other_lines.append(line.strip())
 
-
     except Exception as e:
         print(f"处理URL时发生错误：{e}")
 
@@ -170,6 +159,7 @@ def read_txt_to_array(file_name):
 # 读取文本
 ys_dictionary = read_txt_to_array('央视频道.txt')  # 仅排序用
 ws_dictionary = read_txt_to_array('卫视频道.txt')  # 过滤+排序
+dy_dictionary = read_txt_to_array('影视频道.txt')  # 过滤
 hn_dictionary = read_txt_to_array('地方台/湖南频道.txt')  # 过滤
 sh_dictionary = read_txt_to_array('地方台/上海频道.txt')  # 过滤
 bj_dictionary = read_txt_to_array('地方台/北京频道.txt')  # 过滤
@@ -222,15 +212,12 @@ def correct_name_data(corrections, data):
 
 
 def sort_data(order, data):
-    # 创建一部字典来存储每行数据的索引
     order_dict = {name: i for i, name in enumerate(order)}
 
-    # 定义一个排序键函数，处理不在 order_dict 中的字符串
     def sort_key(line):
         name = line.split(',')[0]
         return order_dict.get(name, len(order))
 
-    # 按照 order 中的顺序对数据进行排序
     sorted_data = sorted(data, key=sort_key)
     return sorted_data
 
@@ -264,11 +251,12 @@ def custom_sort(s):
 time = datetime.now().strftime("%Y-%m-%d %H:%M:%S") + ",url"
 all_lines = ["央视频道,#genre#"] + sort_data(ys_dictionary, set(correct_name_data(corrections_name, ys_lines))) + ['\n'] + \
             ["卫视频道,#genre#"] + sort_data(ws_dictionary, set(correct_name_data(corrections_name, ws_lines))) + ['\n'] + \
+            ["影视频道,#genre#"] + sorted(set(correct_name_data(corrections_name, dy_lines))) + ['\n'] + \
             ["湖南频道,#genre#"] + sorted(set(correct_name_data(corrections_name, hn_lines))) + ['\n'] + \
-            ["上海频道,#genre#"] + sort_data(sh_dictionary, set(correct_name_data(corrections_name, sh_lines))) + ['\n'] + \
-            ["北京频道,#genre#"] + sort_data(bj_dictionary, set(correct_name_data(corrections_name, bj_lines))) + ['\n'] + \
-            ["山东频道,#genre#"] + sort_data(sd_dictionary, set(correct_name_data(corrections_name, sd_lines))) + ['\n'] + \
-            ["河北频道,#genre#"] + sort_data(hb_dictionary, set(correct_name_data(corrections_name, hb_lines))) + ['\n'] + \
+            ["上海频道,#genre#"] + sorted(set(correct_name_data(corrections_name, sh_lines))) + ['\n'] + \
+            ["北京频道,#genre#"] + sorted(set(correct_name_data(corrections_name, bj_lines))) + ['\n'] + \
+            ["山东频道,#genre#"] + sorted(set(correct_name_data(corrections_name, sd_lines))) + ['\n'] + \
+            ["河北频道,#genre#"] + sorted(set(correct_name_data(corrections_name, hb_lines))) + ['\n'] + \
             ["安徽频道,#genre#"] + sorted(set(correct_name_data(corrections_name, ah_lines))) + ['\n'] + \
             ["河南频道,#genre#"] + sorted(set(correct_name_data(corrections_name, hen_lines))) + ['\n'] + \
             ["浙江频道,#genre#"] + sorted(set(correct_name_data(corrections_name, zj_lines))) + ['\n'] + \
@@ -290,18 +278,32 @@ all_lines = ["央视频道,#genre#"] + sort_data(ys_dictionary, set(correct_name
 
 # 将合并后的文本写入文件
 output_file = "iptv_list.txt"
-# others_file = "qita.txt"
 try:
     with open(output_file, 'w', encoding='utf-8') as f:
         for line in all_lines:
             f.write(line + '\n')
     print(f"合并后的文本已保存到文件: {output_file}")
-
-    # with open(others_file, 'w', encoding='utf-8') as f:
-    #     for line in other_lines:
-    #         f.write(line + '\n')
-    # print(f"其他文件已保存到文件: {others_file}")
-
 except Exception as e:
     print(f"保存文件时发生错误：{e}")
+
+################# 生成m3u文件
+output_text = "#EXTM3U\n"
+
+with open(output_file, "r", encoding='utf-8') as file:
+    input_text = file.read()
+
+lines = input_text.strip().split("\n")
+group_name = ""
+for line in lines:
+    parts = line.split(",")
+    if len(parts) == 2 and "#genre#" in line:
+        group_name = parts[0]
+    elif len(parts) == 2:
+        output_text += f"#EXTINF:-1 group-title=\"{group_name}\",{parts[0]}\n"
+        output_text += f"{parts[1]}\n"
+
+with open("iptv_list.m3u", "w", encoding='utf-8') as file:
+    file.write(output_text)
+
+print("iptv_list.m3u文件已生成。")
 
