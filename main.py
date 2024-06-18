@@ -6,7 +6,7 @@ from datetime import datetime
 # 定义要访问的多个URL
 urls = [
     'https://raw.gitcode.com/ouu/scc/raw/main/kankan.txt',
-    # 'https://taoiptv.com/source/iptv.txt?token=8zlxhttq9h01ahaw',
+    # 'https://taoiptv.com/source/iptv.txt?token=',
 ]
 
 # 定义多个对象用于存储不同内容的行文本
