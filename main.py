@@ -6,6 +6,7 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 import subprocess
 import socket
 import time
+from datetime import datetime
 
 
 # 读取文本方法
@@ -358,11 +359,19 @@ def main():
         iptv_list_file_path = "iptv_list.txt"
         with open(iptv_list_file_path, "w", encoding="utf-8") as iptv_list_file:
             iptv_list_file.write(merged_content)
+            # 写入更新日期时间
+            now = datetime.now()
+            iptv_list_file.write(f"更新时间,#genre#\n")
+            iptv_list_file.write(f"{now.strftime("%Y-%m-%d")},url\n")
+            iptv_list_file.write(f"{now.strftime("%H:%M:%S")},url\n")
         print(f"\n所有地区频道列表文件合并完成，文件保存为：{iptv_list_file_path}")
 
     # 调用合并文件的函数
     merge_iptv_files()
 
+
+os.remove("iptv.txt")
+os.remove("iptv_speed.txt")
 
 if __name__ == "__main__":
     main()
