@@ -364,14 +364,19 @@ def main():
             iptv_list_file.write(f"更新时间,#genre#\n")
             iptv_list_file.write(f"{now.strftime("%Y-%m-%d")},url\n")
             iptv_list_file.write(f"{now.strftime("%H:%M:%S")},url\n")
+            # 删除临时文件 iptv.txt 和 iptv_speed.txt
+        try:
+            os.remove('iptv.txt')
+            os.remove('iptv_speed.txt')
+            print(f"临时文件 iptv.txt 和 iptv_speed.txt 已删除。")
+        except OSError as e:
+            print(f"删除临时文件时发生错误: {e}")
+
         print(f"\n所有地区频道列表文件合并完成，文件保存为：{iptv_list_file_path}")
 
     # 调用合并文件的函数
     merge_iptv_files()
 
-
-os.remove("iptv.txt")
-os.remove("iptv_speed.txt")
 
 if __name__ == "__main__":
     main()
