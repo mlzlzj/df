@@ -36,7 +36,6 @@ https://mirror.ghproxy.com/https://raw.githubusercontent.com/pxiptv/live/main/ip
 http://wz.42web.io/ipv4.txt
 https://mirror.ghproxy.com/https://raw.githubusercontent.com/Andreayoo/ming/main/IPTV.txt
 https://mirror.ghproxy.com/https://raw.githubusercontent.com/yuanzl77/IPTV/main/live.txt
-https://mirror.ghproxy.com/https://raw.githubusercontent.com/yuanzl77/IPTV/main/直播/央视频道.txt
 http://120.79.4.185/new/mdlive.txt
 https://mirror.ghproxy.com/https://raw.githubusercontent.com/Fairy8o/IPTV/main/PDX-V4.txt
 http://ww.weidonglong.com/dsj.txt
