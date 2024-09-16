@@ -1,147 +1,11 @@
 import urllib.request
-import re
+from urllib.parse import urlparse
 import os
-from datetime import datetime
-
-# 定义要访问的多个URL
-urls = [
-    'https://raw.gitcode.com/ouu/scc/raw/main/kankan.txt',
-    # 'http://router.bopop.buzz:9999/new/mdlive.txt',
-]
-
-# 定义多个对象用于存储不同内容的行文本
-ys_lines = []  # 央视频道
-ws_lines = []  # 卫视频道
-dy_lines = []  # 影视频道
-zb_lines = []  # 直播频道
-hn_lines = []  # 地方台-湖南频道
-sh_lines = []  # 地方台-上海频道
-bj_lines = []  # 地方台-北京频道
-sd_lines = []  # 地方台-山东频道
-hb_lines = []  # 地方台-河北频道
-zj_lines = []  # 地方台-浙江频道
-ah_lines = []  # 地方台-安徽频道
-hen_lines = []  # 地方台-河南频道
-sx_lines = []  # 地方台-山西频道
-sc_lines = []  # 地方台-四川频道
-ln_lines = []  # 地方台-辽宁频道
-hub_lines = []  # 地方台-湖北频道
-gd_lines = []  # 地方台-广东频道
-gx_lines = []  # 地方台-广西频道
-js_lines = []  # 地方台-江苏频道
-yn_lines = []  # 地方台-云南频道
-cq_lines = []  # 地方台-重庆频道
-jl_lines = []  # 地方台-吉林频道
-xj_lines = []  # 地方台-新疆频道
-gao_lines = []  # 地方台-港澳频道
-tw_lines = []  # 地方台-台湾频道
-radio_lines = []  # 地方台-地方电台
-# other_lines = []
-
-
-def process_name_string(input_str):
-    parts = input_str.split(',')
-    processed_parts = []
-    for part in parts:
-        processed_part = process_part(part)
-        processed_parts.append(processed_part)
-    result_str = ','.join(processed_parts)
-    return result_str
-
-
-def process_part(part_str):
-    if "CCTV" in part_str and "://" not in part_str:
-        part_str = part_str.replace("IPV6", "")  # 先剔除IPV6字样
-        part_str = part_str.replace("PLUS", "+")
-        filtered_str = ''.join(char for char in part_str if char.isdigit() or char == 'K' or char == '+')
-        if not filtered_str.strip():
-            filtered_str = part_str.replace("CCTV", "")
-        if len(filtered_str) > 2 and re.search(r'4K|8K', filtered_str):
-            filtered_str = re.sub(r'(4K|8K).*', r'\1', filtered_str)
-            if len(filtered_str) > 2:
-                filtered_str = re.sub(r'(4K|8K)', r'(\1)', filtered_str)
-
-        return "CCTV" + filtered_str
-
-    elif "卫视" in part_str:
-        pattern = r'卫视「.*」'
-        result_str = re.sub(pattern, '卫视', part_str)
-        return result_str
-
-    return part_str
-
-
-def process_url(url):
-    try:
-        with urllib.request.urlopen(url) as response:
-            data = response.read()
-            text = data.decode('utf-8')
-            # 逐行处理内容
-            lines = text.split('\n')
-            for line in lines:
-                if "#genre#" not in line and "," in line and "://" in line:
-                    channel_name = line.split(',')[0].strip()
-                    # 根据行内容判断存入哪个对象
-                    if "CCTV" in channel_name:  # 央视频道
-                        ys_lines.append(process_name_string(line.strip()))
-                    elif channel_name in ws_dictionary:  # 卫视频道
-                        ws_lines.append(process_name_string(line.strip()))
-                    elif channel_name in dy_dictionary:  # 影视频道
-                        dy_lines.append(process_name_string(line.strip()))
-                    elif channel_name in zb_dictionary:  # 直播频道
-                        zb_lines.append(process_name_string(line.strip()))
-                    elif channel_name in hn_dictionary:  # 地方台-湖南频道
-                        hn_lines.append(process_name_string(line.strip()))
-                    elif channel_name in sh_dictionary:  # 上海频道
-                        sh_lines.append(process_name_string(line.strip()))
-                    elif channel_name in bj_dictionary:  # 北京频道
-                        bj_lines.append(process_name_string(line.strip()))
-                    elif channel_name in sd_dictionary:  # 山东频道
-                        sd_lines.append(process_name_string(line.strip()))
-                    elif channel_name in hb_dictionary:  # 河北频道
-                        hb_lines.append(process_name_string(line.strip()))
-                    elif channel_name in zj_dictionary:  # 浙江频道
-                        zj_lines.append(process_name_string(line.strip()))
-                    elif channel_name in ah_dictionary:  # 安徽频道
-                        ah_lines.append(process_name_string(line.strip()))
-                    elif channel_name in hen_dictionary:  # 河南频道
-                        hen_lines.append(process_name_string(line.strip()))
-                    elif channel_name in sx_dictionary:  # 山西频道
-                        sx_lines.append(process_name_string(line.strip()))
-                    elif channel_name in sc_dictionary:  # 四川频道
-                        sc_lines.append(process_name_string(line.strip()))
-                    elif channel_name in ln_dictionary:  # 辽宁频道
-                        ln_lines.append(process_name_string(line.strip()))
-                    elif channel_name in hub_dictionary:  # 湖北频道
-                        hub_lines.append(process_name_string(line.strip()))
-                    elif channel_name in gd_dictionary:  # 广东频道
-                        gd_lines.append(process_name_string(line.strip()))
-                    elif channel_name in gx_dictionary:  # 广西频道
-                        gx_lines.append(process_name_string(line.strip()))
-                    elif channel_name in js_dictionary:  # 江苏频道
-                        js_lines.append(process_name_string(line.strip()))
-                    elif channel_name in yn_dictionary:  # 云南频道
-                        yn_lines.append(process_name_string(line.strip()))
-                    elif channel_name in cq_dictionary:  # 重庆频道
-                        cq_lines.append(process_name_string(line.strip()))
-                    elif channel_name in jl_dictionary:  # 地方台-吉林频道
-                        jl_lines.append(process_name_string(line.strip()))
-                    elif channel_name in xj_dictionary:  # 地方台-新疆频道
-                        xj_lines.append(process_name_string(line.strip()))
-                    elif channel_name in gao_dictionary:  # 港澳频道
-                        gao_lines.append(process_name_string(line.strip()))
-                    elif channel_name in tw_dictionary:  # 台湾频道
-                        tw_lines.append(process_name_string(line.strip()))
-                    elif channel_name in radio_dictionary:  # 地方台-地方电台
-                        radio_lines.append(process_name_string(line.strip()))
-                    # else:
-                    #     other_lines.append(line.strip())
-
-    except Exception as e:
-        print(f"处理URL时发生错误：{e}")
-
-
-current_directory = os.getcwd()  # 准备读取txt
+import re
+from concurrent.futures import ThreadPoolExecutor, as_completed
+import subprocess
+import socket
+import time
 
 
 # 读取文本方法
@@ -159,33 +23,91 @@ def read_txt_to_array(file_name):
         return []
 
 
-# 读取文本
-ys_dictionary = read_txt_to_array('央视频道.txt')  # 仅排序用
-ws_dictionary = read_txt_to_array('卫视频道.txt')  # 过滤+排序
-dy_dictionary = read_txt_to_array('影视频道.txt')  # 过滤
-zb_dictionary = read_txt_to_array('直播频道.txt')  # 过滤
-hn_dictionary = read_txt_to_array('地方台/湖南频道.txt')  # 过滤
-sh_dictionary = read_txt_to_array('地方台/上海频道.txt')  # 过滤
-bj_dictionary = read_txt_to_array('地方台/北京频道.txt')  # 过滤
-sd_dictionary = read_txt_to_array('地方台/山东频道.txt')  # 过滤
-hb_dictionary = read_txt_to_array('地方台/河北频道.txt')  # 过滤
-zj_dictionary = read_txt_to_array('地方台/浙江频道.txt')  # 过滤
-ah_dictionary = read_txt_to_array('地方台/安徽频道.txt')  # 过滤
-hen_dictionary = read_txt_to_array('地方台/河南频道.txt')  # 过滤
-sx_dictionary = read_txt_to_array('地方台/山西频道.txt')  # 过滤
-sc_dictionary = read_txt_to_array('地方台/四川频道.txt')  # 过滤
-ln_dictionary = read_txt_to_array('地方台/辽宁频道.txt')  # 过滤
-hub_dictionary = read_txt_to_array('地方台/湖北频道.txt')  # 过滤
-gd_dictionary = read_txt_to_array('地方台/广东频道.txt')  # 过滤
-gx_dictionary = read_txt_to_array('地方台/广西频道.txt')  # 过滤
-js_dictionary = read_txt_to_array('地方台/江苏频道.txt')  # 过滤
-yn_dictionary = read_txt_to_array('地方台/云南频道.txt')  # 过滤
-cq_dictionary = read_txt_to_array('地方台/重庆频道.txt')  # 过滤
-jl_dictionary = read_txt_to_array('地方台/吉林频道.txt')  # 过滤
-xj_dictionary = read_txt_to_array('地方台/新疆频道.txt')  # 过滤
-gao_dictionary = read_txt_to_array('地方台/港澳频道.txt')  # 过滤
-tw_dictionary = read_txt_to_array('地方台/台湾频道.txt')  # 过滤
-radio_dictionary = read_txt_to_array('地方台/地方电台.txt')  # 过滤
+# 准备支持 m3u 格式
+def get_url_file_extension(url):
+    # 解析 URL
+    parsed_url = urlparse(url)
+    # 获取路径部分
+    path = parsed_url.path
+    # 提取文件扩展名
+    extension = os.path.splitext(path)[1]
+    return extension
+
+
+def convert_m3u_to_txt(m3u_content):
+    # 分行处理
+    lines = m3u_content.split('\n')
+
+    # 用于存储结果的列表
+    txt_lines = []
+
+    # 临时变量用于存储频道名称
+    channel_name = ""
+
+    for line in lines:
+        # 过滤掉 #EXTM3U 开头的行
+        if line.startswith("#EXTM3U"):
+            continue
+        # 处理 #EXTINF 开头的行
+        if line.startswith("#EXTINF"):
+            # 获取频道名称（假设频道名称在引号后）
+            channel_name = line.split(',')[-1].strip()
+        # 处理 URL 行
+        elif line.startswith("http") or line.startswith("rtmp") or line.startswith("p3p"):
+            txt_lines.append(f"{channel_name},{line.strip()}")
+
+    # 将结果合并成一个字符串，以换行符分隔
+    return '\n'.join(txt_lines)
+
+
+# 处理带 $ 的 URL，把 $ 之后的内容都去掉（包括 $ 也去掉）
+def clean_url(url):
+    last_dollar_index = url.rfind('$')  # 安全起见找最后一个 $ 处理
+    if last_dollar_index != -1:
+        return url[:last_dollar_index]
+    return url
+
+
+# 处理所有 URL
+def process_url(url, timeout=10):
+    try:
+        # 打开 URL 并读取内容
+        start_time = time.time()
+        with urllib.request.urlopen(url, timeout=timeout) as response:
+            # 以二进制方式读取数据
+            data = response.read()
+            # 将二进制数据解码为字符串
+            text = data.decode('utf-8')
+
+            # 处理 m3u 和 m3u8，提取 channel_name 和 channel_address
+            if get_url_file_extension(url) == ".m3u" or get_url_file_extension(url) == ".m3u8":
+                text = convert_m3u_to_txt(text)
+
+            # 逐行处理内容
+            lines = text.split('\n')
+            channel_count = 0  # 初始化频道计数器
+            for line in lines:
+                if "#genre#" not in line and "," in line and "://" in line:
+                    # 拆分成频道名和 URL 部分
+                    parts = line.split(',')
+                    channel_name = parts[0]  # 获取频道名称
+                    channel_address = parts[1]  # 获取频道地址
+                    # 处理带 # 号源 = 予加速源
+                    if "#" not in channel_address:
+                        yield channel_name, clean_url(channel_address)  # 如果没有井号，则照常按照每行规则进行分发
+                    else:
+                        # 如果有 “#” 号，则根据 “#” 号分隔
+                        url_list = channel_address.split('#')
+                        for channel_url in url_list:
+                            yield channel_name, clean_url(channel_url)
+                    channel_count += 1  # 每处理一个频道，计数器加一
+
+            print(f"正在读取URL: {url}")
+            print(f"获取到频道列表: {channel_count} 条")  # 打印频道数量
+
+    except Exception as e:
+        print(f"处理 URL 时发生错误：{e}")
+        return []
 
 
 # 读取纠错频道名称方法
@@ -200,115 +122,247 @@ def load_corrections_name(filename):
     return corrections
 
 
-# 读取纠错文件
-corrections_name = load_corrections_name('corrections_name.txt')
-
-
 # 纠错频道名称
-def correct_name_data(corrections, data):
-    corrected_data = []
-    for line in data:
-        name, url = line.split(',', 1)
-        if name in corrections and name != corrections[name]:
-            name = corrections[name]
-        corrected_data.append(f"{name},{url}")
-    return corrected_data
+def correct_name(name, corrections):
+    return corrections.get(name, name)
 
 
-def sort_data(order, data):
-    order_dict = {name: i for i, name in enumerate(order)}
-
-    def sort_key(line):
-        name = line.split(',')[0]
-        return order_dict.get(name, len(order))
-
-    sorted_data = sorted(data, key=sort_key)
-    return sorted_data
-
-
-# 循环处理每个URL
-for url in urls:
-    print(f"处理URL: {url}")
-    process_url(url)
+# 删除目录内所有 .txt 文件
+def clear_txt_files(directory):
+    for filename in os.listdir(directory):
+        if filename.endswith('.txt'):
+            file_path = os.path.join(directory, filename)
+            try:
+                os.remove(file_path)
+            except Exception as e:
+                print(f"删除文件时发生错误: {e}")
 
 
-# 定义一个函数，提取每行中逗号前面的数字部分作为排序的依据
-def extract_number(s):
-    num_str = s.split(',')[0].split('-')[1]  # 提取逗号前面的数字部分
-    numbers = re.findall(r'\d+', num_str)  # 因为有+和K
-    return int(numbers[-1]) if numbers else 999
+# 主函数
+def main():
+    # 读取 URLs
+    urls_file_path = os.path.join(os.getcwd(), 'config/urls.txt')
+    urls = read_txt_to_array(urls_file_path)
 
+    # 读取纠错文件
+    corrections_name = load_corrections_name('config/re_name.txt')
 
-# 定义一个自定义排序函数
-def custom_sort(s):
-    if "CCTV-4K" in s:
-        return 2  # 将包含 "4K" 的字符串排在后面
-    elif "CCTV-8K" in s:
-        return 3  # 将包含 "8K" 的字符串排在后面 
-    elif "(4K)" in s:
-        return 1  # 将包含 " (4K)" 的字符串排在后面
-    else:
-        return 0  # 其他字符串保持原顺序
+    # 处理 URLs 并获取频道列表
+    all_channels = []
+    for url in urls:
+        for channel_name, channel_url in process_url(url):
+            corrected_name = correct_name(channel_name, corrections_name)
+            all_channels.append((corrected_name, channel_url))
 
+    # 去重
+    unique_channels = list(set(all_channels))
 
-# 合并所有对象中的行文本（去重，排序后拼接）
-time = datetime.now().strftime("%Y-%m-%d %H:%M:%S") + ",url"
-all_lines = ["央视频道,#genre#"] + sort_data(ys_dictionary, set(correct_name_data(corrections_name, ys_lines))) + ['\n'] + \
-            ["卫视频道,#genre#"] + sort_data(ws_dictionary, set(correct_name_data(corrections_name, ws_lines))) + ['\n'] + \
-            ["影视频道,#genre#"] + sorted(set(correct_name_data(corrections_name, dy_lines))) + ['\n'] + \
-            ["直播频道,#genre#"] + sorted(set(correct_name_data(corrections_name, zb_lines))) + ['\n'] + \
-            ["湖南频道,#genre#"] + sorted(set(correct_name_data(corrections_name, hn_lines))) + ['\n'] + \
-            ["上海频道,#genre#"] + sorted(set(correct_name_data(corrections_name, sh_lines))) + ['\n'] + \
-            ["北京频道,#genre#"] + sorted(set(correct_name_data(corrections_name, bj_lines))) + ['\n'] + \
-            ["山东频道,#genre#"] + sorted(set(correct_name_data(corrections_name, sd_lines))) + ['\n'] + \
-            ["河北频道,#genre#"] + sorted(set(correct_name_data(corrections_name, hb_lines))) + ['\n'] + \
-            ["安徽频道,#genre#"] + sorted(set(correct_name_data(corrections_name, ah_lines))) + ['\n'] + \
-            ["河南频道,#genre#"] + sorted(set(correct_name_data(corrections_name, hen_lines))) + ['\n'] + \
-            ["浙江频道,#genre#"] + sorted(set(correct_name_data(corrections_name, zj_lines))) + ['\n'] + \
-            ["山西频道,#genre#"] + sorted(set(correct_name_data(corrections_name, sx_lines))) + ['\n'] + \
-            ["四川频道,#genre#"] + sorted(set(correct_name_data(corrections_name, sc_lines))) + ['\n'] + \
-            ["辽宁频道,#genre#"] + sorted(set(correct_name_data(corrections_name, ln_lines))) + ['\n'] + \
-            ["湖北频道,#genre#"] + sorted(set(correct_name_data(corrections_name, hub_lines))) + ['\n'] + \
-            ["广东频道,#genre#"] + sorted(set(correct_name_data(corrections_name, gd_lines))) + ['\n'] + \
-            ["广西频道,#genre#"] + sorted(set(correct_name_data(corrections_name, gx_lines))) + ['\n'] + \
-            ["江苏频道,#genre#"] + sorted(set(correct_name_data(corrections_name, js_lines))) + ['\n'] + \
-            ["云南频道,#genre#"] + sorted(set(correct_name_data(corrections_name, yn_lines))) + ['\n'] + \
-            ["重庆频道,#genre#"] + sorted(set(correct_name_data(corrections_name, cq_lines))) + ['\n'] + \
-            ["吉林频道,#genre#"] + sorted(set(correct_name_data(corrections_name, jl_lines))) + ['\n'] + \
-            ["新疆频道,#genre#"] + sorted(set(correct_name_data(corrections_name, xj_lines))) + ['\n'] + \
-            ["港澳频道,#genre#"] + sort_data(gao_dictionary, set(correct_name_data(corrections_name, gao_lines))) + ['\n'] + \
-            ["台湾频道,#genre#"] + sort_data(tw_dictionary, set(correct_name_data(corrections_name, tw_lines))) + ['\n'] + \
-            ["地方电台,#genre#"] + sort_data(radio_dictionary, set(radio_lines)) + ['\n'] + \
-            ["更新时间,#genre#"] + [time]
+    unique_channels_str = [f"{name},{url}" for name, url in unique_channels]
 
-# 将合并后的文本写入文件
-output_file = "iptv_list.txt"
-try:
-    with open(output_file, 'w', encoding='utf-8') as f:
-        for line in all_lines:
+    # 写入 iptv.txt 文件
+    iptv_file_path = os.path.join(os.getcwd(), 'iptv.txt')
+    with open(iptv_file_path, 'w', encoding='utf-8') as f:
+        for line in unique_channels_str:
             f.write(line + '\n')
-    print(f"合并后的文本已保存到文件: {output_file}")
-except Exception as e:
-    print(f"保存文件时发生错误：{e}")
 
-################# 生成m3u文件
-output_text = "#EXTM3U\n"
+    # 打印出本次写入iptv.txt文件的总频道列表数量
+    with open(iptv_file_path, 'r', encoding='utf-8') as f:
+        lines = f.readlines()
+        total_channels = len(lines)
+        print(f"\n所有频道已保存到文件: {iptv_file_path}，共采集到频道数量: {total_channels} 条\n")
 
-with open(output_file, "r", encoding='utf-8') as file:
-    input_text = file.read()
+    def check_url(url, channel_name, timeout=6):
+        start_time = time.time()
+        elapsed_time = None
+        success = False
 
-lines = input_text.strip().split("\n")
-group_name = ""
-for line in lines:
-    parts = line.split(",")
-    if len(parts) == 2 and "#genre#" in line:
-        group_name = parts[0]
-    elif len(parts) == 2:
-        output_text += f"#EXTINF:-1 group-title=\"{group_name}\",{parts[0]}\n"
-        output_text += f"{parts[1]}\n"
+        try:
+            if url.startswith("http"):
+                response = urllib.request.urlopen(url, timeout=timeout)
+                if response.status == 200:
+                    success = True
+            elif url.startswith("p3p"):
+                success = check_p3p_url(url, timeout)
+            elif url.startswith("rtmp"):
+                success = check_rtmp_url(url, timeout)
+            elif url.startswith("rtp"):
+                success = check_rtp_url(url, timeout)
+            else:
+                return None, False
 
-with open("iptv_list.m3u", "w", encoding='utf-8') as file:
-    file.write(output_text)
+            elapsed_time = (time.time() - start_time) * 1000  # 转换为毫秒
+        except Exception as e:
+            print(f"检测错误 {channel_name}: {url}: {e}")
 
-print("iptv_list.m3u文件已生成。")
+        return elapsed_time, success
 
+    # 以下是检测不同协议URL的函数
+    def check_rtmp_url(url, timeout):
+        try:
+            result = subprocess.run(['ffprobe', '-v', 'error', '-rtmp_transport', 'tcp', '-i', url],
+                                    stdout=subprocess.PIPE,
+                                    stderr=subprocess.PIPE, timeout=timeout)
+            return result.returncode == 0
+        except subprocess.TimeoutExpired:
+            print(f"检测超时 {url}")
+        except Exception as e:
+            print(f"检测错误 {url}: {e}")
+        return False
+
+    def check_rtp_url(url, timeout):
+        try:
+            parsed_url = urlparse(url)
+            host = parsed_url.hostname
+            port = parsed_url.port
+
+            with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as s:
+                s.settimeout(timeout)
+                s.connect((host, port))
+                s.sendto(b'', (host, port))
+                s.recv(1)
+            return True
+        except (socket.timeout, socket.error):
+            return False
+
+    def check_p3p_url(url, timeout):
+        try:
+            parsed_url = urlparse(url)
+            host = parsed_url.hostname
+            port = parsed_url.port
+            path = parsed_url.path
+
+            with socket.create_connection((host, port), timeout=timeout) as s:
+                request = f"GET {path} P3P/1.0\r\nHost: {host}\r\n\r\n"
+                s.sendall(request.encode())
+                response = s.recv(1024)
+                return b"P3P" in response
+        except Exception as e:
+            print(f"检测错误 {url}: {e}")
+        return False
+
+    # 去掉文本'$'后面的内容
+    def process_line(line):
+        if "://" not in line:
+            return None, None
+        line = line.split('$')[0]
+        parts = line.split(',')
+        if len(parts) == 2:
+            name, url = parts
+            elapsed_time, is_valid = check_url(url.strip(), name)
+            if is_valid:
+                return elapsed_time, f"{name},{url}"
+        return None, None
+
+    def process_urls_multithreaded(lines, max_workers=200):
+        results = []
+        with ThreadPoolExecutor(max_workers=max_workers) as executor:
+            futures = {executor.submit(process_line, line): line for line in lines}
+            for future in as_completed(futures):
+                elapsed_time, result = future.result()
+                if elapsed_time is not None:
+                    results.append((elapsed_time, result))
+
+        # 按照检测后的毫秒数升序排列
+        results.sort()
+        return results
+
+    # 使用多线程检测URL
+    results = process_urls_multithreaded(unique_channels_str)
+
+    # 写入文件
+    def write_list(file_path, data_list):
+        with open(file_path, 'w', encoding='utf-8') as file:
+            for item in data_list:
+                elapsed_time, result = item
+                channel_name, channel_url = result.split(',')
+                file.write(f"{channel_name},{channel_url}\n")
+
+    # 写入结果到文件
+    iptv_speed_file_path = os.path.join(os.getcwd(), 'iptv_speed.txt')
+    write_list(iptv_speed_file_path, results)
+
+    # 打印结果
+    for elapsed_time, result in results:
+        channel_name, channel_url = result.split(',')
+        print(f"检测成功  {channel_name},{channel_url}  响应时间 ：{elapsed_time:.0f} 毫秒")
+
+    # 创建地方频道文件夹
+    local_channels_directory = os.path.join(os.getcwd(), '地方频道')
+    if not os.path.exists(local_channels_directory):
+        os.makedirs(local_channels_directory)
+        print(f"目录 '{local_channels_directory}' 已创建。")
+    else:
+        # 清空地方频道文件夹内所有的 .txt 文件
+        clear_txt_files(local_channels_directory)
+
+    # 遍历频道模板目录下的所有文件
+    template_directory = os.path.join(os.getcwd(), '频道模板')
+    if not os.path.exists(template_directory):
+        os.makedirs(template_directory)
+        print(f"目录 '{template_directory}' 已创建。")
+    template_files = [f for f in os.listdir(template_directory) if f.endswith('.txt')]
+
+    # 读取 iptv_speed.txt 文件中的频道列表
+    iptv_speed_channels = read_txt_to_array(iptv_speed_file_path)
+
+    # 对于每个模板文件，进行比对并写入结果
+    for template_file in template_files:
+        template_channels = read_txt_to_array(os.path.join(template_directory, template_file))
+        template_name = os.path.splitext(template_file)[0]
+
+        # 筛选出匹配的频道
+        matched_channels = [channel for channel in iptv_speed_channels if
+                            channel.split(',')[0] in template_channels]
+
+        # 对 CCTV 频道进行排序
+        def channel_key(channel_name):
+            match = re.search(r'\d+', channel_name)
+            if match:
+                return int(match.group())
+            else:
+                return float('inf')  # 返回一个无穷大的数字作为关键字
+
+        matched_channels.sort(key=lambda x: channel_key(x.split(',')[0]))
+        matched_channels.sort(key=lambda x: channel_key(x[0]))
+
+        # 写入对应地区命名的 _iptv.txt 文件中，保存在地方频道文件夹中
+        output_file_path = os.path.join(local_channels_directory, f"{template_name}_iptv.txt")
+        with open(output_file_path, 'w', encoding='utf-8') as f:
+            # 写入标题行
+            f.write(f"{template_name},#genre#\n")
+            for channel in matched_channels:
+                f.write(channel + '\n')
+        print(f"频道列表已写入: {template_name}_iptv.txt")
+
+    # 合并所有 _iptv.txt 文件
+    def merge_iptv_files():
+        merged_content = ""
+        # 获取所有 _iptv.txt 文件的路径
+        iptv_files = [f for f in os.listdir(local_channels_directory) if f.endswith('_iptv.txt')]
+        # 确定央视频道和卫视频道的文件名
+        central_channel_file = "央视频道_iptv.txt"
+        satellite_channel_file = "卫视频道_iptv.txt"
+        # 将央视频道和卫视频道文件放在合并列表的开头
+        for file_name in [central_channel_file, satellite_channel_file]:
+            if file_name in iptv_files:
+                file_path = os.path.join(local_channels_directory, file_name)
+                with open(file_path, "r", encoding="utf-8") as file:
+                    merged_content += file.read() + "\n"
+                iptv_files.remove(file_name)
+        # 按文件名排序，然后添加剩余的频道
+        for file_name in sorted(iptv_files):
+            file_path = os.path.join(local_channels_directory, file_name)
+            with open(file_path, "r", encoding="utf-8") as file:
+                merged_content += file.read() + "\n"
+        # 将合并后的内容写入 iptv_list.txt 文件
+        iptv_list_file_path = "iptv_list.txt"
+        with open(iptv_list_file_path, "w", encoding="utf-8") as iptv_list_file:
+            iptv_list_file.write(merged_content)
+        print(f"\n所有地区频道列表文件合并完成，文件保存为：{iptv_list_file_path}")
+
+    # 调用合并文件的函数
+    merge_iptv_files()
+
+
+if __name__ == "__main__":
+    main()
