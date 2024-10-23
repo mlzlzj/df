@@ -2,7 +2,7 @@ name: dfyuan
 
 on:
   schedule:
-    - cron: '0 ,03 * * *'
+    - cron: '0 ,06,18, * * *'
   push:
     branches:
       - main
