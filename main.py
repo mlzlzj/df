@@ -111,21 +111,22 @@ def process_url(url, timeout=10):
         return []
 
 
-# 读取纠错频道名称方法
-def load_corrections_name(filename):
-    corrections = {}
-    with open(filename, 'r', encoding='utf-8') as f:
-        for line in f:
-            parts = line.strip().split(',')
-            correct_name = parts[0]
-            for name in parts[1:]:
-                corrections[name] = correct_name
-    return corrections
+# 函数用于过滤和替换频道名称
+def filter_and_modify_sources(corrections):
+    filtered_corrections = []
+    name_dict = ['购物', '理财', '导视', '指南', '测试', '芒果', 'CGTN']
+    url_dict = []  # '2409:'过滤ipv6频道
 
-
-# 纠错频道名称
-def correct_name(name, corrections):
-    return corrections.get(name, name)
+    for name, url in corrections:
+        if any(word.lower() in name.lower() for word in name_dict) or any(word in url for word in url_dict):
+            print("过滤频道:" + name + "," + url)
+        else:
+            # 进行频道名称的替换操作
+            name = name.replace("FHD", "").replace("HD", "").replace("hd", "").replace("频道", "").replace("高清", "") \
+                .replace("超清", "").replace("20M", "").replace("-", "").replace("4k", "").replace("4K", "") \
+                .replace("4kR", "")
+            filtered_corrections.append((name, url))
+    return filtered_corrections
 
 
 # 删除目录内所有 .txt 文件
@@ -145,18 +146,17 @@ def main():
     urls_file_path = os.path.join(os.getcwd(), 'config/urls.txt')
     urls = read_txt_to_array(urls_file_path)
 
-    # 读取纠错文件
-    corrections_name = load_corrections_name('config/re_name.txt')
-
-    # 处理 URLs 并获取频道列表
+    # 处理过滤和替换频道名称
     all_channels = []
     for url in urls:
         for channel_name, channel_url in process_url(url):
-            corrected_name = correct_name(channel_name, corrections_name)
-            all_channels.append((corrected_name, channel_url))
+            all_channels.append((channel_name, channel_url))
+
+    # 过滤和修改频道名称
+    filtered_channels = filter_and_modify_sources(all_channels)
 
     # 去重
-    unique_channels = list(set(all_channels))
+    unique_channels = list(set(filtered_channels))
 
     unique_channels_str = [f"{name},{url}" for name, url in unique_channels]
 
@@ -373,7 +373,6 @@ def merge_iptv_files():
         print(f"删除临时文件时发生错误: {e}")
 
     print(f"\n所有地区频道列表文件合并完成，文件保存为：{iptv_list_file_path}")
-
 
     # 调用合并文件的函数
     merge_iptv_files()
