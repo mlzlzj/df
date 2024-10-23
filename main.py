@@ -335,44 +335,45 @@ def main():
                 f.write(channel + '\n')
         print(f"频道列表已写入: {template_name}_iptv.txt")
 
-    # 合并所有 _iptv.txt 文件
-    def merge_iptv_files():
-        merged_content = ""
-        # 获取所有 _iptv.txt 文件的路径
-        iptv_files = [f for f in os.listdir(local_channels_directory) if f.endswith('_iptv.txt')]
-        # 确定央视频道和卫视频道的文件名
-        central_channel_file = "央视频道_iptv.txt"
-        satellite_channel_file = "卫视频道_iptv.txt"
-        # 将央视频道和卫视频道文件放在合并列表的开头
-        for file_name in [central_channel_file, satellite_channel_file]:
-            if file_name in iptv_files:
-                file_path = os.path.join(local_channels_directory, file_name)
-                with open(file_path, "r", encoding="utf-8") as file:
-                    merged_content += file.read() + "\n"
-                iptv_files.remove(file_name)
-        # 按文件名排序，然后添加剩余的频道
-        for file_name in sorted(iptv_files):
+# 合并所有 _iptv.txt 文件
+def merge_iptv_files():
+    merged_content = ""
+    # 获取所有 _iptv.txt 文件的路径
+    iptv_files = [f for f in os.listdir(local_channels_directory) if f.endswith('_iptv.txt')]
+    # 确定央视频道和卫视频道的文件名
+    central_channel_file = "央视频道_iptv.txt"
+    satellite_channel_file = "卫视频道_iptv.txt"
+    # 将央视频道和卫视频道文件放在合并列表的开头
+    for file_name in [central_channel_file, satellite_channel_file]:
+        if file_name in iptv_files:
             file_path = os.path.join(local_channels_directory, file_name)
             with open(file_path, "r", encoding="utf-8") as file:
                 merged_content += file.read() + "\n"
-        # 将合并后的内容写入 iptv_list.txt 文件
-        iptv_list_file_path = "iptv_list.txt"
-        with open(iptv_list_file_path, "w", encoding="utf-8") as iptv_list_file:
-            iptv_list_file.write(merged_content)
-            # 写入更新日期时间
-            now = datetime.now()
-            iptv_list_file.write(f"更新时间,#genre#\n")
-            iptv_list_file.write(f"{now.strftime("%Y-%m-%d")},url\n")
-            iptv_list_file.write(f"{now.strftime("%H:%M:%S")},url\n")
-            # 删除临时文件 iptv.txt 和 iptv_speed.txt
-        try:
-            os.remove('iptv.txt')
-            os.remove('iptv_speed.txt')
-            print(f"临时文件 iptv.txt 和 iptv_speed.txt 已删除。")
-        except OSError as e:
-            print(f"删除临时文件时发生错误: {e}")
+            iptv_files.remove(file_name)
+    # 按文件名排序，然后添加剩余的频道
+    for file_name in sorted(iptv_files):
+        file_path = os.path.join(local_channels_directory, file_name)
+        with open(file_path, "r", encoding="utf-8") as file:
+            merged_content += file.read() + "\n"
+    # 获取当前时间
+    now = datetime.now()
+    update_time_line = f"更新时间,#genre#\n{now.strftime('%Y-%m-%d')},url\n{now.strftime('%H:%M:%S')},url\n"
 
-        print(f"\n所有地区频道列表文件合并完成，文件保存为：{iptv_list_file_path}")
+    # 将合并后的内容写入 iptv_list.txt 文件
+    iptv_list_file_path = "iptv_list.txt"
+    with open(iptv_list_file_path, "w", encoding="utf-8") as iptv_list_file:
+        iptv_list_file.write(update_time_line)
+        iptv_list_file.write(merged_content)
+        # 删除临时文件 iptv.txt 和 iptv_speed.txt
+    try:
+        os.remove('iptv.txt')
+        os.remove('iptv_speed.txt')
+        print(f"临时文件 iptv.txt 和 iptv_speed.txt 已删除。")
+    except OSError as e:
+        print(f"删除临时文件时发生错误: {e}")
+
+    print(f"\n所有地区频道列表文件合并完成，文件保存为：{iptv_list_file_path}")
+
 
     # 调用合并文件的函数
     merge_iptv_files()
