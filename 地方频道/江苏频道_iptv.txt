@@ -1,6 +1,0 @@
-江苏频道,#genre#
-优漫卡通,http://iptvcyp.top:9901/tsfile/live/1045_1.m3u8?key=txiptv&playlive=1&authid=0
-优漫卡通,http://wouu.net:9977/udp/239.93.0.251:5140
-优漫卡通,http://110.177.146.171:888/udp/239.1.1.72:8072
-优漫卡通,http://[2409:8087:1a0b:df::4005]:80/ottrrs.hl.chinamobile.com/PLTV/88888888/224/3221225656/index.m3u8
-南京新闻综合,http://tvbox6.icu/tv/migu.php?id=njxwzh
