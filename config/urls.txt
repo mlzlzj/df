@@ -39,3 +39,9 @@ https://gitee.com/lovems/tv/raw/master/ds.m3u
 https://gitee.com/very-learned/tv/raw/master/hxydipv4.m3u
 https://gitee.com/very-learned/tv/raw/master/hxdxipv4.m3u
 https://gitee.com/qwfy90/tv/raw/master/result.m3u
+https://8249.kstore.space/lswj/tv.txt
+https://live.iptv365.org/live.txt
+http://8.138.7.223/live.txt  
+https://l.gmbbk.com/upload/14781478.txt
+https://ghp.ci/https://raw.githubusercontent.com/qinvision/Film-Television/main/dujuejiami.txt
+
