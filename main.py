@@ -377,7 +377,7 @@ def main():
 
             # 只保留每个分组的前20个频道
             for channel_name in channels_grouped:
-                channels_grouped[channel_name] = channels_grouped[channel_name][:20]
+                channels_grouped[channel_name] = channels_grouped[channel_name][:200]
 
             # 将处理后的频道列表写入文件
             for channel_name in channels_grouped:
